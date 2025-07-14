@@ -2,20 +2,15 @@ package main
 
 import (
 	"AuthInGo/app"
-	"log"
-	"os"
-
-	"github.com/joho/godotenv"
+	config "AuthInGo/config/env"
+	
 )
 
 func main(){
-	err:=godotenv.Load(".env")
-	if err != nil{
-		log.Fatalln("Error loading in env file",err)
-	}
+	config.Load()
+	
 
-	port:= os.Getenv("PORT")
-	cfg:= app.NewConfig(port)
+	cfg:= app.NewConfig()
 	app:= app.NewApplication(cfg)
 
 	app.Run()
