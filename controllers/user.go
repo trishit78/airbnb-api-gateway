@@ -4,6 +4,8 @@ import (
 	"AuthInGo/services"
 	"fmt"
 	"net/http"
+	"encoding/json"
+    
 )
 
 type UserController struct {
@@ -20,7 +22,11 @@ func (uc *UserController) GetUserByID (w http.ResponseWriter, r *http.Request){
 	fmt.Println("creating user in userController")
 	//uc.UserService.CreateUser()
 	uc.UserService.GetUserByID()
-	w.Write([]byte("User fetching endpoint done"))
+	 w.Header().Set("Content-Type", "application/json")
+    w.WriteHeader(http.StatusCreated)
+
+	response:= "user got successfully"
+	 json.NewEncoder(w).Encode(response)
 }
 
 
@@ -29,6 +35,11 @@ func (uc *UserController) CreateUser (w http.ResponseWriter, r *http.Request){
 	fmt.Println("creating user in userController")
 	uc.UserService.CreateUser()
 	w.Write([]byte("User fetching endpoint done"))
+
+	 w.Header().Set("Content-Type", "application/json")
+    w.WriteHeader(http.StatusCreated)
+	response:= "user created successfully"
+	 json.NewEncoder(w).Encode(response)
 }
 
 
@@ -36,5 +47,9 @@ func (uc *UserController) LoginUser (w http.ResponseWriter, r *http.Request){
 	fmt.Println("LoginUser called in userController")
 	uc.UserService.LoginUser()
 	
-	w.Write([]byte("User login endpoint done"))
+	 w.Header().Set("Content-Type", "application/json")
+    w.WriteHeader(http.StatusCreated)
+
+	response:= "user logged in successfully"
+	 json.NewEncoder(w).Encode(response)
 }

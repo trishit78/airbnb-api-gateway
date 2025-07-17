@@ -1,18 +1,16 @@
 package services
 
 import (
-	_ "AuthInGo/config/env"
 	db "AuthInGo/db/repositories"
 	"AuthInGo/utils"
 	"fmt"
-
-	_ "github.com/golang-jwt/jwt/v5"
+	env "AuthInGo/config/env"
+	 "github.com/golang-jwt/jwt/v5"
 )
-
 type UserService interface {
 	GetUserByID() error
 	CreateUser() error
-	LoginUser() error
+	LoginUser() (string,error)
 }
 
 type UserServiceImpl struct {
@@ -42,10 +40,10 @@ func (u *UserServiceImpl) CreateUser() error {
 
 func (u *UserServiceImpl) GetUserByID() error {
 	fmt.Println("Fetching user in UserService")
-	u.userRepository.DeleteByID(1)
+	u.userRepository.GetByID(4)
 	return nil
 }
-func (u *UserServiceImpl) LoginUser() error {
+func (u *UserServiceImpl) LoginUser() (string,error) {
 	// Pre-requisite: This function will be given email and password as parameter, which we can hardcode for now
 	email := "username@example.com"
 	password := "example_password"
@@ -53,7 +51,8 @@ func (u *UserServiceImpl) LoginUser() error {
 	matchUser, err := u.userRepository.GetByEmail(email)
 	// Step 2. If user exists, or not. If not exists, return error
 	if err != nil {
-		fmt.Println("user not matched")
+		fmt.Println("user not matched",err)
+		return "",err
 	}
 	// Step 3. If user exists, check the password using utils.CheckPasswordHash
 	res := utils.CheckPasswordHash(password, matchUser.Password)
@@ -61,19 +60,23 @@ func (u *UserServiceImpl) LoginUser() error {
 
 	if !res {
 		fmt.Println("password does not match")
-		return nil
+		return "",nil
 	}
 	fmt.Println("login success")
-	// payload:= jwt.MapClaims{
-	// 	"email":matchUser.Email,
-	// 	"id":matchUser.Id,
-	// }
+	payload:= jwt.MapClaims{
+		"email":matchUser.Email,
+		"id":matchUser.Id,
+	}
 
-	// token:= jwt.NewWithClaims(jwt.SigningMethodHS256,payload)
-	// tokenString,err :=token.SignedString([]byte(env.GetString("JWT_SECRET","TOKEN")))
+	token:= jwt.NewWithClaims(jwt.SigningMethodHS256,payload)
+	tokenString,err :=token.SignedString([]byte(env.GetString("JWT_SECRET","TOKEN")))
 
-	// if err!=nil{
-	// 	fmt.Println("Generated JWT Token",tokenString)
-	// }
-	return nil
+	if err!=nil{
+		fmt.Println("Error signing Token",tokenString)
+		return "",err
+	
+	}
+	fmt.Println("JWT Token:",tokenString)
+
+	return tokenString,nil
 }

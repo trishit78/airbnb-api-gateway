@@ -8,7 +8,7 @@ import (
 
 type UserRepository interface {
 	//Create() error
-	GetByID() (*models.User, error)
+	GetByID(id int64) (*models.User, error)
 	Create(username string,email string,password string) ( error)
 	GetAll() ([]*models.User, error)
 	DeleteByID(id int64) error
@@ -111,14 +111,14 @@ query := "INSERT INTO users (username, email, password) VALUES (?, ?, ?)"
 }
 
 
-func (u *UserRepositoryImpl) GetByID() (*models.User, error) {
-	fmt.Println("Getching user in UserRepository")
+func (u *UserRepositoryImpl) GetByID(id int64) (*models.User, error) {
+	fmt.Println("fetching user in UserRepository")
 
 	// Step 1: Prepare the query
 	query := "SELECT id, username, email, created_at, updated_at FROM users WHERE id = ?"
 
 	// Step 2: Execute the query
-	row := u.db.QueryRow(query, 1)
+	row := u.db.QueryRow(query, id)
 
 	// Step 3: Process the result
 	user := &models.User{}
