@@ -1,14 +1,16 @@
 package services
 
 import (
+	env "AuthInGo/config/env"
 	db "AuthInGo/db/repositories"
+	"AuthInGo/models"
 	"AuthInGo/utils"
 	"fmt"
-	env "AuthInGo/config/env"
-	 "github.com/golang-jwt/jwt/v5"
+
+	"github.com/golang-jwt/jwt/v5"
 )
 type UserService interface {
-	GetUserByID() error
+	GetUserByID(id int64) (*models.User,error)
 	CreateUser() error
 	LoginUser() (string,error)
 }
@@ -38,10 +40,10 @@ func (u *UserServiceImpl) CreateUser() error {
 	return nil
 }
 
-func (u *UserServiceImpl) GetUserByID() error {
+func (u *UserServiceImpl) GetUserByID(id int64) (*models.User,error) {
 	fmt.Println("Fetching user in UserService")
-	u.userRepository.GetByID(4)
-	return nil
+	return u.userRepository.GetByID(4)
+	
 }
 func (u *UserServiceImpl) LoginUser() (string,error) {
 	// Pre-requisite: This function will be given email and password as parameter, which we can hardcode for now

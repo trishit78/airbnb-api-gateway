@@ -21,11 +21,15 @@ func NewUserController(_userService services.UserService) *UserController{
 func (uc *UserController) GetUserByID (w http.ResponseWriter, r *http.Request){
 	fmt.Println("creating user in userController")
 	//uc.UserService.CreateUser()
-	uc.UserService.GetUserByID()
-	 w.Header().Set("Content-Type", "application/json")
+	user ,err :=uc.UserService.GetUserByID(4)
+	 
+	fmt.Println("user is",user)
+	fmt.Println("err is",err)
+	
+	w.Header().Set("Content-Type", "application/json")
     w.WriteHeader(http.StatusCreated)
 
-	response:= "user got successfully"
+	response:= fmt.Sprintf("user got successfully: %+v", user)
 	 json.NewEncoder(w).Encode(response)
 }
 
