@@ -1,11 +1,12 @@
 package controllers
 
 import (
+	"AuthInGo/dto"
 	"AuthInGo/services"
+	"AuthInGo/utils"
+	"encoding/json"
 	"fmt"
 	"net/http"
-	"encoding/json"
-    
 )
 
 type UserController struct {
@@ -19,18 +20,19 @@ func NewUserController(_userService services.UserService) *UserController{
 }
 
 func (uc *UserController) GetUserByID (w http.ResponseWriter, r *http.Request){
-	fmt.Println("creating user in userController")
-	//uc.UserService.CreateUser()
+	// create a dto for payload
+
+	//readjson and give error
+
+	//validate payload
+
+
 	user ,err :=uc.UserService.GetUserByID(4)
 	 
-	fmt.Println("user is",user)
-	fmt.Println("err is",err)
-	
-	w.Header().Set("Content-Type", "application/json")
-    w.WriteHeader(http.StatusCreated)
+	//deal with this err
 
-	response:= fmt.Sprintf("user got successfully: %+v", user)
-	 json.NewEncoder(w).Encode(response)
+	//success response
+	
 }
 
 
@@ -47,13 +49,30 @@ func (uc *UserController) CreateUser (w http.ResponseWriter, r *http.Request){
 }
 
 
-func (uc *UserController) LoginUser (w http.ResponseWriter, r *http.Request){
-	fmt.Println("LoginUser called in userController")
-	uc.UserService.LoginUser()
-	
-	 w.Header().Set("Content-Type", "application/json")
-    w.WriteHeader(http.StatusCreated)
 
-	response:= "user logged in successfully"
-	 json.NewEncoder(w).Encode(response)
+func (uc *UserController) LoginUser(w http.ResponseWriter, r *http.Request) {
+
+	var payload dto.LoginUserRequestDTO
+
+	if jsonErr := utils.ReadJsonBody(r, &payload); jsonErr != nil {
+		utils.WriteJsonErrorResponse(w, http.StatusBadRequest, "Something went wrong while logging in", jsonErr)
+		return
+	}
+
+	fmt.Println("Payload received:", payload)
+
+	if validationErr := utils.Validator.Struct(payload); validationErr != nil {
+		utils.WriteJsonErrorResponse(w, http.StatusBadRequest, "Invalid input data", validationErr)
+		return
+	}
+
+	jwtToken, err := uc.UserService.LoginUser(&payload)
+
+	if err != nil {
+		utils.WriteJsonErrorResponse(w, http.StatusInternalServerError, "Failed to login user", err)
+		return
+	}
+
+	utils.WriteJsonSuccessResponse(w, http.StatusOK, "User logged in successfully", jwtToken)
+
 }

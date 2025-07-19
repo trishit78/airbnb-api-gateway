@@ -147,14 +147,14 @@ func (u *UserRepositoryImpl) GetByEmail(email string) (*models.User, error) {
 	fmt.Println("Getching user in UserRepository")
 
 	// Step 1: Prepare the query
-	query := "SELECT id, username, email, created_at, updated_at FROM users WHERE email = ?"
+	query := "SELECT id, username, email,password, created_at, updated_at FROM users WHERE email = ?"
 
 	// Step 2: Execute the query
 	row := u.db.QueryRow(query, email)
 
 	// Step 3: Process the result
 	user := &models.User{}
-	err := row.Scan(&user.Id, &user.Username, &user.Email, &user.CreatedAt, &user.UpdatedAt)
+	err := row.Scan(&user.Id, &user.Username, &user.Email,&user.Password, &user.CreatedAt, &user.UpdatedAt)
 
 	if err != nil {
 		if err == sql.ErrNoRows {
@@ -169,3 +169,4 @@ func (u *UserRepositoryImpl) GetByEmail(email string) (*models.User, error) {
 	fmt.Println("User fetched successfully:", user)
 	return user, nil
 }
+
